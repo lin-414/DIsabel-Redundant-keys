@@ -31,9 +31,16 @@ FetchContent_MakeAvailable(CommonLibSSE)
 # it here explicitly.
 include("${commonlibsse_SOURCE_DIR}/cmake/CommonLibSSE.cmake")
 
+find_package(simpleini CONFIG REQUIRED)
+
 add_commonlibsse_plugin(${PROJECT_NAME}
     SOURCES
         src/plugin.cpp
+)
+
+target_link_libraries(${PROJECT_NAME}
+    PRIVATE
+        SimpleIni::SimpleIni
 )
 
 target_precompile_headers(${PROJECT_NAME}
@@ -45,6 +52,7 @@ target_compile_definitions(${PROJECT_NAME}
     PRIVATE
         _UNICODE
         UNICODE
+        NOMINMAX
         DISABLE_REDUNDANT_KEYS_VERSION="${PROJECT_VERSION}"
 )
 

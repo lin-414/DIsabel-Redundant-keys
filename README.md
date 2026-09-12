@@ -7,6 +7,7 @@ The plugin does **not** replace `controlmap.txt`, does not require an ESP, and d
 ## Features
 
 - Prevents the native **Quicksave**, **Quickload**, and **Auto-Move** actions from reaching Skyrim's gameplay handlers.
+- **Configurable**: each action can be toggled independently via an INI file, and advanced users can suppress any additional controlmap user event by name.
 - Preserves all of Skyrim's control mappings instead of unmapping them.
 - Keeps the default key bindings available to UI mods such as RaceMenu that query the vanilla bindings.
 - Leaves the physical key codes intact for other SKSE hotkey mods.
@@ -60,6 +61,37 @@ SKSE/
 
 Enable the mod and launch Skyrim through SKSE.
 
+## Configuration
+
+Without a config file the plugin suppresses all three supported actions. To change that, create an INI file next to the DLL:
+
+```text
+Data/SKSE/Plugins/Disable Redundant keys.ini
+```
+
+with the following contents (keys under `[Suppressions]` default to `1` when omitted):
+
+```ini
+[Suppressions]
+; 1 = suppress this action during gameplay, 0 = leave vanilla behavior
+Quicksave=1
+Quickload=1
+AutoMove=1
+
+[Custom]
+; Advanced: comma-separated controlmap user event names to also suppress,
+; e.g. CustomEvents=Wait,Quick Map
+CustomEvents=
+```
+
+For example, to keep quick save and quick load working and only disable auto-move, set `Quicksave=0` and `Quickload=0`.
+
+Notes:
+
+- Suppression is keyed on user event names, so blocking follows the controls even if the player remaps them.
+- Settings are read once when the game starts; restart Skyrim after editing the file.
+- Unknown keys under `[Suppressions]` are reported in the plugin log, so typos are easy to spot.
+
 ## Testing
 
 After loading a save:
@@ -70,6 +102,7 @@ After loading a save:
 4. Confirm that other vanilla keys such as `T`, `M`, `P`, `I`, and `J` still work normally.
 5. Open RaceMenu and verify that **Choose Texture** still uses the vanilla Wait-bound key.
 6. Activate a bed and confirm that sleeping still works normally.
+7. Create the INI file with `Quicksave=0`, restart the game, and confirm that quick save works again while auto-move stays disabled.
 
 The plugin log is written to:
 
@@ -103,7 +136,7 @@ package/
         └── Disable Redundant keys.dll
 
 dist/
-└── Disable-Redundant-keys-v0.4.1.zip
+└── Disable-Redundant-keys-v0.5.0.zip
 ```
 
 The ZIP itself contains only the deployable `SKSE/` tree.
@@ -112,7 +145,7 @@ The ZIP itself contains only the deployable `SKSE/` tree.
 
 `VERSION` is the source of truth for the project version.
 
-Current source version: **v0.4.1**
+Current source version: **v0.5.0**
 
 Versioning policy:
 
@@ -122,6 +155,13 @@ Versioning policy:
 - `README.md` and package metadata must be updated whenever `VERSION` changes.
 
 ## Changelog
+
+### 0.5.0
+
+- Added INI configuration. Each supported action (Quicksave, Quickload, AutoMove) can be toggled independently in `Data/SKSE/Plugins/Disable Redundant keys.ini`, so players who rely on quick save / quick load can disable only auto-move.
+- Advanced: additional controlmap user event names can be suppressed via the `[Custom] CustomEvents` list without recompiling.
+- Without a config file the behavior is unchanged from 0.4.1 (all three actions suppressed). Unknown keys in the config are reported in the plugin log.
+- Built with [SimpleIni](https://github.com/brofield/simpleini) (header-only, already part of the dependency tree).
 
 ### 0.4.1
 
