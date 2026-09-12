@@ -128,6 +128,7 @@ Versioning policy:
 - Migrated to the maintained **[CommonLibSSE-NG](https://github.com/alandtse/CommonLibSSE-NG)** fork (v7.5.4), replacing the unmaintained colorglass vcpkg port. The single plugin DLL now also supports Skyrim AE **1.7.99** and the VR runtime layout, in addition to SE 1.5.97 and AE 1.6.629+.
 - Dependencies (spdlog, fmt, DirectXTK, ...) now come from the standard vcpkg registry and are linked statically (`x64-windows-static-md`), so the release archive still ships a single plugin DLL.
 - No change to the suppression behavior itself.
+- **Note on file size:** the DLL grows from ~343 KB (v0.4.0) to ~593 KB. The increase is entirely the statically linked framework: code (+97 KB, SE/AE/VR multi-runtime paths, the patch-safety disassembler, two years of additional engine class coverage) and read-only data (+151 KB, RTTI for the larger class surface plus the runtime/offset version tables). No new runtime DLL dependencies were added.
 
 ### 0.4.0
 
