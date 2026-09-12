@@ -25,11 +25,14 @@ if exist build rmdir /s /q build
 if exist package rmdir /s /q package
 
 REM Configure
-cmake -S . -B build ^
+cmake -S . -B build -G "Visual Studio 17 2022" -A x64 ^
   -DCMAKE_BUILD_TYPE=Release ^
   -DCMAKE_TOOLCHAIN_FILE="%VCPKG_ROOT%\scripts\buildsystems\vcpkg.cmake"
 
-if errorlevel 1 exit /b %errorlevel%
+if errorlevel 1 (
+    echo ERROR: CMake configuration failed. Make sure Visual Studio 2022 with the C++ workload is installed.
+    exit /b %errorlevel%
+)
 
 REM Build
 cmake --build build --config Release

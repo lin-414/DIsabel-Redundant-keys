@@ -34,6 +34,9 @@ include("${commonlibsse_SOURCE_DIR}/cmake/CommonLibSSE.cmake")
 find_package(simpleini CONFIG REQUIRED)
 
 add_commonlibsse_plugin(${PROJECT_NAME}
+    NAME "Disable Redundant keys"
+    AUTHOR "lin-414"
+    VERSION ${PROJECT_VERSION}
     SOURCES
         src/plugin.cpp
 )

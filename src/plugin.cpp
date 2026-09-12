@@ -11,6 +11,7 @@
 #include <optional>
 #include <spdlog/sinks/basic_file_sink.h>
 #include <string>
+#include <system_error>
 #include <utility>
 #include <vector>
 
@@ -33,16 +34,38 @@ namespace DisableRedundantKeys
             return std::addressof(singleton);
         }
 
-        void AddSuppressedEvent(std::string a_name) { suppressed.push_back(std::move(a_name)); }
+        // Names are stored lowercased so the lookup below can match
+        // case-insensitively; user event names are plain ASCII.
+        void AddSuppressedEvent(std::string_view a_name)
+        {
+            std::string lower;
+            lower.reserve(a_name.size());
+            for (const char c : a_name) {
+                lower.push_back(static_cast<char>(std::tolower(static_cast<unsigned char>(c))));
+            }
+            suppressed.push_back(std::move(lower));
+        }
 
         [[nodiscard]] const std::vector<std::string>& Suppressed() const noexcept { return suppressed; }
 
         [[nodiscard]] bool IsSuppressed(const RE::BSFixedString& a_userEvent) const
         {
+            const auto view = std::string_view(a_userEvent);
             return std::any_of(
                 suppressed.begin(),
                 suppressed.end(),
-                [&](const std::string& a_name) { return static_cast<std::string_view>(a_userEvent) == a_name; });
+                [&](const std::string& a_name) {
+                    if (a_name.size() != view.size()) {
+                        return false;
+                    }
+                    for (std::size_t i = 0; i < view.size(); ++i) {
+                        if (std::tolower(static_cast<unsigned char>(view[i])) !=
+                            static_cast<unsigned char>(a_name[i])) {
+                            return false;
+                        }
+                    }
+                    return true;
+                });
         }
 
     private:
@@ -89,7 +112,7 @@ namespace DisableRedundantKeys
 
         for (const auto& [key, userEvent] : kConfigurableActions) {
             if (ini.GetBoolValue("Suppressions", key.data(), /* a_pDefault = */ true)) {
-                config->AddSuppressedEvent(std::string(userEvent));
+                config->AddSuppressedEvent(userEvent);
             }
         }
 
@@ -126,9 +149,17 @@ namespace DisableRedundantKeys
                 item.remove_suffix(1);
             }
             if (!item.empty()) {
-                config->AddSuppressedEvent(std::string(item));
+                config->AddSuppressedEvent(item);
                 logger::info("Suppressing custom user event '{}'", item);
             }
+        }
+    }
+
+    void AddDefaultSuppressedEvents()
+    {
+        auto* config = Config::GetSingleton();
+        for (const auto& [key, userEvent] : kConfigurableActions) {
+            config->AddSuppressedEvent(userEvent);
         }
     }
 
@@ -137,14 +168,17 @@ namespace DisableRedundantKeys
         auto* config = Config::GetSingleton();
 
         const auto configPath = GetConfigPath();
-        if (configPath && std::filesystem::exists(*configPath)) {
+        std::error_code ec;
+        if (configPath && std::filesystem::exists(*configPath, ec)) {
             logger::info("Loading config file '{}'", configPath->string());
             ApplyConfigFile(*configPath);
+        } else if (configPath && !ec) {
+            logger::info(
+                "No config file found at '{}'; suppressing all default actions", configPath->string());
+            AddDefaultSuppressedEvents();
         } else {
-            logger::info("No config file found; suppressing all default actions");
-            for (const auto& [key, userEvent] : kConfigurableActions) {
-                config->AddSuppressedEvent(std::string(userEvent));
-            }
+            logger::warn("Unable to determine the config file location; suppressing all default actions");
+            AddDefaultSuppressedEvents();
         }
 
         const auto& suppressed = config->Suppressed();

@@ -84,10 +84,30 @@ For example, to keep quick save and quick load working and only disable auto-mov
 Notes:
 
 - Advanced: suppress any additional controlmap user event by name.
+- Custom event names are matched **case-insensitively**; internal spaces are kept (`Toggle Always Run` and `toggle always run` both work).
 - Suppression is keyed on user event names, so blocking follows the controls even if the player remaps them.
 - Settings are read once when the game starts; restart Skyrim after editing the file.
+- Save the INI file as ANSI or UTF-8 (not UTF-16), otherwise it cannot be parsed.
 - Unknown keys under `[Suppressions]` are reported in the plugin log, so typos are easy to spot.
 - Deleting the INI file restores the default behavior (all actions suppressed).
+
+Common user event names (from the vanilla `controlmap.txt`) that can be used with `CustomEvents`:
+
+| User event | Vanilla action (default key) |
+| --- | --- |
+| `Wait` | Wait menu (T) |
+| `Quicksave` / `Quickload` | Quick save / load (F5 / F9) |
+| `Auto-Move` | Auto-move toggle (C) |
+| `Toggle Always Run` | Walk/run toggle (CapsLock) |
+| `Run` | Walk/run hold (Left Shift) |
+| `Sprint` | Sprint (Left Alt) |
+| `Sneak` | Sneak (Left Ctrl) |
+| `Journal` | Journal (J) |
+| `Quick Inventory` / `Quick Magic` / `Quick Map` / `Quick Stats` | Items (I) / Magic (P) / Map (M) / Skill tree (/) |
+| `Favorites` | Favorites (Q) |
+| `Tween Menu` | Main menu (Tab) |
+
+Movement and combat events (`Forward`, `Attack`, `Activate`, ...) exist too but suppressing them makes the game unplayable — filter only toggle and menu-type actions.
 
 ## Testing
 
@@ -133,7 +153,7 @@ package/
         └── Disable Redundant keys.dll
 
 dist/
-└── Disable-Redundant-keys-v0.5.0.zip
+└── Disable-Redundant-keys-v0.5.1.zip
 ```
 
 The ZIP itself contains only the deployable `SKSE/` tree.
@@ -142,7 +162,7 @@ The ZIP itself contains only the deployable `SKSE/` tree.
 
 `VERSION` is the source of truth for the project version.
 
-Current source version: **v0.5.0**
+Current source version: **v0.5.1**
 
 Versioning policy:
 
@@ -152,6 +172,14 @@ Versioning policy:
 - `README.md` and package metadata must be updated whenever `VERSION` changes.
 
 ## Changelog
+
+### 0.5.1
+
+- Custom event names are now matched case-insensitively, so `toggle always run` works the same as `Toggle Always Run`.
+- The plugin log now shows the expected config file location when no config file is present, and no longer aborts on filesystem errors while checking for it.
+- SKSE plugin metadata (name, author, version) is now embedded in the DLL.
+- `build_release.bat` now pins the Visual Studio 2022 generator so it no longer mis-picks NMake on machines where VS is not registered.
+- README: added a user-event name reference table and an INI encoding note.
 
 ### 0.5.0
 
