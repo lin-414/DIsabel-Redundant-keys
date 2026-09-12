@@ -47,6 +47,10 @@ if exist "build\Release\Disable Redundant keys.dll" (
     exit /b 1
 )
 
+if exist "Disable Redundant keys.ini" (
+    copy /Y "Disable Redundant keys.ini" "package\SKSE\Plugins\Disable Redundant keys.ini" >nul
+)
+
 REM Prepare distribution folder
 if not exist "dist" mkdir "dist"
 
@@ -64,6 +68,7 @@ echo Build complete: v%VERSION%
 echo.
 echo Package:
 echo   package\SKSE\Plugins\Disable Redundant keys.dll
+echo   package\SKSE\Plugins\Disable Redundant keys.ini
 echo.
 echo Release:
 echo   %ZIP_PATH%

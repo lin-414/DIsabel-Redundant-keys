@@ -56,20 +56,15 @@ The release package contains:
 ```text
 SKSE/
 └── Plugins/
-    └── Disable Redundant keys.dll
+    ├── Disable Redundant keys.dll
+    └── Disable Redundant keys.ini
 ```
 
 Enable the mod and launch Skyrim through SKSE.
 
 ## Configuration
 
-Without a config file the plugin suppresses all three supported actions. To change that, create an INI file next to the DLL:
-
-```text
-Data/SKSE/Plugins/Disable Redundant keys.ini
-```
-
-with the following contents (keys under `[Suppressions]` default to `1` when omitted):
+A default configuration file ships with the mod at `Data/SKSE/Plugins/Disable Redundant keys.ini`; all actions are suppressed out of the box:
 
 ```ini
 [Suppressions]
@@ -88,9 +83,11 @@ For example, to keep quick save and quick load working and only disable auto-mov
 
 Notes:
 
+- Advanced: suppress any additional controlmap user event by name.
 - Suppression is keyed on user event names, so blocking follows the controls even if the player remaps them.
 - Settings are read once when the game starts; restart Skyrim after editing the file.
 - Unknown keys under `[Suppressions]` are reported in the plugin log, so typos are easy to spot.
+- Deleting the INI file restores the default behavior (all actions suppressed).
 
 ## Testing
 
@@ -158,7 +155,7 @@ Versioning policy:
 
 ### 0.5.0
 
-- Added INI configuration. Each supported action (Quicksave, Quickload, AutoMove) can be toggled independently in `Data/SKSE/Plugins/Disable Redundant keys.ini`, so players who rely on quick save / quick load can disable only auto-move.
+- Added INI configuration. Each supported action (Quicksave, Quickload, AutoMove) can be toggled independently in the shipped `Data/SKSE/Plugins/Disable Redundant keys.ini`, so players who rely on quick save / quick load can disable only auto-move.
 - Advanced: additional controlmap user event names can be suppressed via the `[Custom] CustomEvents` list without recompiling.
 - Without a config file the behavior is unchanged from 0.4.1 (all three actions suppressed). Unknown keys in the config are reported in the plugin log.
 - Built with [SimpleIni](https://github.com/brofield/simpleini) (header-only, already part of the dependency tree).
