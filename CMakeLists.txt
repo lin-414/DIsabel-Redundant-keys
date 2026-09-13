@@ -39,6 +39,7 @@ add_commonlibsse_plugin(${PROJECT_NAME}
     VERSION ${PROJECT_VERSION}
     SOURCES
         src/plugin.cpp
+        src/Config.cpp
 )
 
 target_link_libraries(${PROJECT_NAME}
@@ -66,3 +67,31 @@ endif()
 set_target_properties(${PROJECT_NAME} PROPERTIES
     OUTPUT_NAME "Disable Redundant keys"
 )
+
+option(DRK_BUILD_TESTS "Build the offline config unit tests" OFF)
+if(DRK_BUILD_TESTS)
+    # The config tests link the config layer without CommonLibSSE, so their
+    # dependencies must be found in this scope (CommonLibSSE's own
+    # find_package calls run inside its subdirectory).
+    find_package(spdlog CONFIG REQUIRED)
+    find_package(fmt CONFIG REQUIRED)
+    add_executable(config_tests
+        tests/ConfigTests.cpp
+        src/Config.cpp
+    )
+    target_include_directories(config_tests
+        PRIVATE
+            src
+    )
+    target_link_libraries(config_tests
+        PRIVATE
+            SimpleIni::SimpleIni
+            spdlog::spdlog
+            fmt::fmt
+    )
+    target_compile_features(config_tests PRIVATE cxx_std_23)
+    if(MSVC)
+        target_compile_options(config_tests PRIVATE /W4 /utf-8)
+        target_compile_definitions(config_tests PRIVATE NOMINMAX _UNICODE UNICODE)
+    endif()
+endif()
