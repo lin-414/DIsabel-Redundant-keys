@@ -153,7 +153,7 @@ package/
         └── Disable Redundant keys.dll
 
 dist/
-└── Disable-Redundant-keys-v0.5.1.zip
+└── Disable-Redundant-keys-v0.5.2.zip
 ```
 
 The ZIP itself contains only the deployable `SKSE/` tree.
@@ -162,7 +162,7 @@ The ZIP itself contains only the deployable `SKSE/` tree.
 
 `VERSION` is the source of truth for the project version.
 
-Current source version: **v0.5.1**
+Current source version: **v0.5.2**
 
 Versioning policy:
 
@@ -172,6 +172,12 @@ Versioning policy:
 - `README.md` and package metadata must be updated whenever `VERSION` changes.
 
 ## Changelog
+
+### 0.5.2
+
+- Fixed an unparseable config file (e.g. wrong encoding) silently disabling all suppression; it now falls back to the three defaults.
+- Fixed the plugin log flagging every valid `[Suppressions]` key as unknown; warnings now only fire for actual typos.
+- The config layer was split into an engine-free module (`src/Config.h`/`src/Config.cpp`) covered by 31 offline unit tests (`tests/`, built with `-DDRK_BUILD_TESTS=ON`), covering default fallbacks, per-action switches, case-insensitive custom event matching, whitespace handling, encoding quirks, and unknown-key tolerance.
 
 ### 0.5.1
 
