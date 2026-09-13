@@ -64,7 +64,7 @@ Enable the mod and launch Skyrim through SKSE.
 
 ## Configuration
 
-A default configuration file ships with the mod at `Data/SKSE/Plugins/Disable Redundant keys.ini`; all actions are suppressed out of the box:
+A default configuration file ships with the mod at `Data/SKSE/Plugins/Disable Redundant keys.ini`; all actions are suppressed out of the box. The file also contains a **reference table of every vanilla controlmap user event with its default key**, so `CustomEvents` entries can be copied straight from it:
 
 ```ini
 [Suppressions]
@@ -178,6 +178,7 @@ Versioning policy:
 - Fixed an unparseable config file (e.g. wrong encoding) silently disabling all suppression; it now falls back to the three defaults.
 - Fixed the plugin log flagging every valid `[Suppressions]` key as unknown; warnings now only fire for actual typos.
 - The config layer was split into an engine-free module (`src/Config.h`/`src/Config.cpp`) covered by 31 offline unit tests (`tests/`, built with `-DDRK_BUILD_TESTS=ON`), covering default fallbacks, per-action switches, case-insensitive custom event matching, whitespace handling, encoding quirks, and unknown-key tolerance.
+- The shipped INI file now includes a reference table of all vanilla controlmap user events and their default keys.
 
 ### 0.5.1
 
